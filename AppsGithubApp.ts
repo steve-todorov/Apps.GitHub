@@ -8,7 +8,7 @@ import { ApiSecurity, ApiVisibility } from '@rocket.chat/apps-engine/definition/
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { WebhookEndpoint } from './endpoints/webhook';
-import { GithubSlashcommand } from './slashcommands/github';
+import { GithubSlashCommand } from './slashcommands/github';
 
 export class AppsGithubApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -22,6 +22,6 @@ export class AppsGithubApp extends App {
             endpoints: [new WebhookEndpoint(this)],
         });
 
-        configuration.slashCommands.provideSlashCommand(new GithubSlashcommand(this));
+        configuration.slashCommands.provideSlashCommand(new GithubSlashCommand(this));
     }
 }
