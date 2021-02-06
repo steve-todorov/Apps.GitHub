@@ -16,6 +16,18 @@ export class AppPersistence {
         }, true);
     }
 
+    public async connectedReposToRoom(room: IRoom): Promise<Array<object>> {
+        const userAssociation = new RocketChatAssociationRecord(RocketChatAssociationModel.ROOM, room.id);
+
+        return await this.persistenceRead.readByAssociations([userAssociation]);
+    }
+
+    public async disconnectRepoToRoom(repoName: string, room: IRoom): Promise<void> {
+        const roomAssociation = new RocketChatAssociationRecord(RocketChatAssociationModel.ROOM, room.id);
+        const repoAssociation = new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, `repo:${repoName}`);
+        await this.persistence.removeByAssociations([roomAssociation, repoAssociation]);
+    }
+
     public async setUserAccessToken(accessToken: string, user: IUser): Promise<void> {
         const userAssociation = new RocketChatAssociationRecord(RocketChatAssociationModel.USER, user.id);
         const typeAssociation = new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, 'github-key');

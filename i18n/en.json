@@ -1,4 +1,4 @@
 {
-    "slashcommand_params": "connect REPO_URL, set-token TOKEN",
+    "slashcommand_params": "connect <REPO_URL> | set-token <TOKEN> | ping <REPO_URL> <HOOK_ID> | list | help",
     "slashcommand_description": "Interacts with the Github App"
 }

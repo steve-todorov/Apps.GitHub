@@ -6,7 +6,7 @@ import {sendNotification} from '../../lib/helpers/sendNotification';
 import {AppPersistence} from '../../lib/persistence';
 import {getRepoName, GithubSDK} from '../../lib/sdk';
 
-export class ConnectCommand {
+export class DisconnectCommand {
 
     public constructor(private readonly app: AppsGithubApp) {
     }
@@ -35,8 +35,9 @@ export class ConnectCommand {
     }
 
     private async processRepo(repoUrl: string, context: SlashCommandContext, read: IRead, modify: IModify, http: IHttp, persis: IPersistence) {
+
         if (!repoUrl) {
-            await sendNotification('Usage: `/github connect REPO_URL REPO_URL2 REPO_URL3`', read, modify, context.getSender(), context.getRoom());
+            await sendNotification('Usage: `/github disconnect REPO_URL REPO_URL2 REPO_URL3`', read, modify, context.getSender(), context.getRoom());
             return;
         }
 
@@ -54,31 +55,24 @@ export class ConnectCommand {
         const sdk = new GithubSDK(this.app, http, accessToken);
 
         try {
-            await sdk.createWebhook(repoName, rocketChatHookUrl);
+            await sdk.deleteWebhook(repoName, rocketChatHookUrl);
         } catch (err) {
             this.app.getLogger().error(err);
-
             // 404 usually means the token doesn't have admin_hook (write:hook) access.
             if (err.statusCode !== 404) {
-                const errorMsg = `Failed to connect ${repoUrl} to this channel!\nPlease check the logs for more info.`;
+                const errorMsg = `Failed to disconnect ${repoUrl} from this channel!\nPlease check the logs for more info.`;
                 await sendNotification(errorMsg, read, modify, context.getSender(), context.getRoom());
                 return;
             } else {
-                let errorMsg = `Unable to create hook for repo ${repoUrl}! \nYou need to add one yourself: \n\n`;
-                errorMsg += '```\n';
-                errorMsg += 'Payload: ' + rocketChatHookUrl + '\n';
-                errorMsg += 'Content type: application/json\n';
-                errorMsg += 'Let me select individual events: \n';
-                errorMsg += ' - Pushes \n';
-                errorMsg += ' - Pull requests \n';
-                errorMsg += '```\n\n';
-                errorMsg += `Connecting ${repoUrl} to ${context.getRoom().displayName}...`;
+                let errorMsg = `Unable to delete hook for repository ${repoUrl}! \nYou need to delete it yourself! \n\n`;
+                errorMsg += `Disconnecting ${repoUrl} from ${context.getRoom().displayName}...`;
                 await sendNotification(errorMsg, read, modify, context.getSender(), context.getRoom());
             }
         }
 
-        await persistence.connectRepoToRoom(repoName, context.getRoom());
-
-        await sendNotification(`Successfully connected ${repoUrl} to channel.`, read, modify, context.getSender(), context.getRoom());
+        await persistence.disconnectRepoToRoom(repoName, context.getRoom());
+        const message = `Successfully disconnected from ${repoUrl}!`;
+        await sendNotification(message, read, modify, context.getSender(), context.getRoom());
     }
+
 }

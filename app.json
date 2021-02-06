@@ -11,5 +11,6 @@
     "name": "Apps.Github",
     "nameSlug": "appsgithub",
     "classFile": "AppsGithubApp.ts",
-    "description": "Integrates GitHub with your Rocket.Chat"
+    "description": "Integrates GitHub with your Rocket.Chat",
+    "implements": []
 }
