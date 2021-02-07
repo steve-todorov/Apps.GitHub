@@ -20,7 +20,7 @@ export class ListConnectedCommand {
 
         if (list !== null && list.length > 0) {
             list.forEach((metadata: any) => {
-                message += `- ${metadata.repoName}`;
+                message += `- ${metadata.repoName} \n`;
             });
         } else {
             message += 'None found!';
