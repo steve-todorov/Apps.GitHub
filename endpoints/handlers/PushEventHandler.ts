@@ -7,13 +7,15 @@ export class PushEventHandler extends BaseEventHandler {
 
         const sender = this.getGithubSender(payload);
 
+        const isDeleted = payload.deleted;
+
         let commitMessage: string | null = null;
         let commitDetails: string | null = null;
         let commits = '';
 
-        if (payload.head_commit) {
+        if (!isDeleted && payload.head_commit) {
             commitMessage = payload.head_commit.message;
-            commitMessage = 'Commit: ' + commitMessage.trim().replace(/(?:\r\n|\r|\n)/g, '');
+            commitMessage = 'Commit: ' + commitMessage;
             commitMessage += ' \n';
 
             commitDetails = `${payload.head_commit.added.length} new, `;
@@ -21,6 +23,10 @@ export class PushEventHandler extends BaseEventHandler {
             commitDetails += `${payload.head_commit.modified.length} modified files`;
 
             commits = `Changes: ${commitDetails} \n`;
+        }
+
+        if (isDeleted) {
+            commitMessage = 'Branch was deleted \n';
         }
 
         let author = '';
@@ -32,7 +38,7 @@ export class PushEventHandler extends BaseEventHandler {
         const repoUrl = `[${payload.repository.full_name}/${payload.ref}](${commitUrl})`;
         const compareUrl = `[Click here for diff](${payload.compare})`;
 
-        return `Repository: ${repoUrl} \n ${commitMessage} ${commits} ${author} ${compareUrl}`;
+        return `Repository: ${repoUrl} \n${commitMessage} ${commits} ${author} ${compareUrl}`;
     }
 
 }

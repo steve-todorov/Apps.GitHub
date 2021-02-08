@@ -43,8 +43,14 @@ export abstract class BaseEventHandler {
     }
 
     protected getGithubSender(payload: WebhookEvent): GithubUser | null {
-        if (payload != null && 'sender' in payload && typeof payload.sender === 'object') {
-            return payload.sender as GithubUser;
+        if (payload != null) {
+            // When merged, set the github user to be the person who's merging.
+            if ('pull_request' in payload && typeof payload.pull_request === 'object' && 'merged_by' in payload.pull_request) {
+                return payload.pull_request.merged_by as GithubUser;
+            } else if ('sender' in payload && typeof payload.sender === 'object') {
+                // fallback to sender
+                return payload.sender as GithubUser;
+            }
         }
 
         return null;
